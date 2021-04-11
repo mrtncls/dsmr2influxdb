@@ -1,4 +1,4 @@
-# dsmr2influxdb
+# DSMR2InfluxDB
 
 Read telemetry data (DSMR format) from the Fluvius smart digital meter's P1 port and forward to InfluxDB.
 This project uses an ESP32 with micropython firmware.
