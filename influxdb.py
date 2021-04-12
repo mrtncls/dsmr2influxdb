@@ -16,7 +16,7 @@ def _connect():
     addr = socket.getaddrinfo(INFLUXDB_HOST, INFLUXDB_PORT)[0][-1]
     
     tcp_socket = socket.socket()
-    tcp_socket.connect(addr)    
+    tcp_socket.connect(addr)
 
 def _create_write_request(line_data):
 
@@ -39,26 +39,29 @@ def _write_influxdb(line_data):
 
     while True:
 
-        if tcp_socket is None:
-            _connect()        
-
         try:
+
+            if tcp_socket is None:
+                _connect()
+                
             tcp_socket.send(bytes(request, 'utf8'))
 
             response = ''
-            while True:                
+            while True:
                 data = tcp_socket.recv(100)
 
                 if data:
                     response += str(data, 'utf8')
-                    
-                    if (len(data) < 100):                        
+                                        
+                    if response.endswith('\r\n\r\n'):
                         if (response.startswith('HTTP/1.1 204 No Content')):
                             print('Metrics written')
                             return
                         else:                    
                             raise Exception('POST request failed: {}'.format(response))
-
+                else:
+                    raise Exception('No response received for POST request')
+                        
         except Exception as e:
             retries_left = retries_left - 1
             if tcp_socket:

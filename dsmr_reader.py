@@ -38,6 +38,7 @@ def read():
 
     uart = UART(1, baudrate=115200, bits=8, parity=None, stop=1, rx=RX, rxbuf=2048, tx=TX, invert=UART.INV_RX)
     raw_data = bytearray()
+    found_header = False
 
     while True:
 
@@ -52,6 +53,7 @@ def read():
                     print ("Found beginning of P1 telegram")
                     print('*' * 60 + "\n")
                 raw_data = bytearray()
+                found_header = True
 
             if DEBUG:
                print ("Reading: ", data_line)
@@ -66,5 +68,8 @@ def read():
                     print(raw_data)
                     print('*' * 40)
 
+                if not found_header:
+                    raise Exception('Header not found in telegram')
+                    
                 validate_checksum(raw_data)
                 return parse(raw_data)
