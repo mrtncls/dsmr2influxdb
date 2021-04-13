@@ -8,6 +8,7 @@ INFLUXDB_BUCKET = 'bucket'
 INFLUXDB_TOKEN = 'token'
 
 tcp_socket = None
+last_telegram = {}
 
 def _connect():
 
@@ -79,11 +80,24 @@ def _get_line_data(telegram, measurement, tags, fields):
     line_fields = ''
     seperator = ''
     for field_name in fields:
-        if field_name in telegram:
+        if field_name in telegram and \
+            _is_value_updated(telegram, field_name):
+            
             line_fields = '{}{}{}={}'.format(line_fields, seperator, field_name, telegram[field_name])
             seperator = ','
 
-    return '{}{} {}'.format(measurement, line_tags, line_fields)
+    if len(line_fields) > 0:
+        return '{}{} {}'.format(measurement, line_tags, line_fields)
+    else:
+        return ''
+
+def _is_value_updated(telegram, field_name):
+    if field_name in telegram and \
+        field_name in last_telegram and \
+        telegram[field_name] == last_telegram[field_name]:
+        return False
+    else:
+        return True
 
 def _get_electricity_line_data(telegram):
     tags = [
@@ -134,9 +148,24 @@ def _get_gas_line_data(telegram):
     return _get_line_data(telegram, 'gas_meter', tags, fields)
 
 def write(telegram):
-    line_data = '{}\n{}'.format(
-        _get_electricity_line_data(telegram),
-        _get_gas_line_data(telegram))        
+    global last_telegram
+    
+    electricity_line_data = _get_electricity_line_data(telegram)
+    gas_line_data = _get_gas_line_data(telegram)
+
+    last_telegram = telegram
+
+    line_data = ''
+    if len(electricity_line_data) > 0 and len(gas_line_data) > 0:
+        line_data = '{}\n{}'.format(electricity_line_data, gas_line_data)
+    elif len(electricity_line_data) > 0:
+        line_data = electricity_line_data
+    elif len(gas_line_data) > 0:
+        line_data = gas_line_data
+    else:
+        print('No fields updated. Skipped influx write.')
+        return
+    
+    # print('line data: {}'.format(line_data))
 
     _write_influxdb(line_data)
-
