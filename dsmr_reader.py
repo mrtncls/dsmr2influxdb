@@ -1,13 +1,17 @@
 import ure
 import time
-from machine import UART
+from machine import UART, Pin
 from dsmr_parameter_regex import DSMR_CONFIG
 from dsmr_checksum import validate_checksum
 
-TX = 12
 RX = 15
+RTS = 13
+TX = 12 # not used
 DEBUG = False
 TEST = False
+
+rts_pin = Pin(RTS, Pin.OUT)
+rts_pin.value(0)
 
 def parse(raw_data):
     telegram = {}
@@ -43,7 +47,14 @@ def read():
     while True:
 
         if not uart.any():
-            time.sleep(1)
+
+            rts_pin.value(1)            
+            time.sleep_ms(100)            
+            rts_pin.value(0)
+            
+            if DEBUG:
+                print('Sent RTS')
+
         else:
 
             data_line = uart.readline()

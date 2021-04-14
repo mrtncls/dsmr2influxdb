@@ -1,3 +1,4 @@
+import time
 from dsmr_reader import read as read_dsmr
 from wifi import connect as connect_wifi
 from influxdb import write as write_to_influx
@@ -35,6 +36,8 @@ def main():
                 write_to_influx(telegram)
             except Exception as e:
                 print('Write telegram error: {}'.format(e))
+
+        time.sleep(5)
 
 if __name__ == '__main__':
     main()
