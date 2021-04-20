@@ -75,7 +75,7 @@ def _get_line_data(telegram, measurement, tags, fields):
     line_tags = ''
     for tag_name in tags:
         if tag_name in telegram:
-            line_tags = '{},{}={}'.format(line_tags, tag_name, telegram[tag_name])
+            line_tags = '{},{}={}'.format(line_tags, _escape_key(tag_name), telegram[tag_name])
 
     line_fields = ''
     seperator = ''
@@ -83,13 +83,19 @@ def _get_line_data(telegram, measurement, tags, fields):
         if field_name in telegram and \
             _is_value_updated(telegram, field_name):
             
-            line_fields = '{}{}{}={}'.format(line_fields, seperator, field_name, telegram[field_name])
+            line_fields = '{}{}{}={}'.format(line_fields, seperator, _escape_key(field_name), telegram[field_name])
             seperator = ','
 
     if len(line_fields) > 0:
         return '{}{} {}'.format(measurement, line_tags, line_fields)
     else:
         return ''
+
+def _escape_key(key):
+    return key \
+        .replace(" ", "\ ") \
+        .replace("=", "\=") \
+        .replace(",", "\,")
 
 def _is_value_updated(telegram, field_name):
     if field_name in telegram and \
@@ -132,7 +138,7 @@ def _get_electricity_line_data(telegram):
         param.E_SHORT_POWER_FAILURE_COUNT,
     ]
 
-    return _get_line_data(telegram, 'electricity_meter', tags, fields)
+    return _get_line_data(telegram, 'Electricity\ meter', tags, fields)
     
 def _get_gas_line_data(telegram):
     tags = [
@@ -145,7 +151,7 @@ def _get_gas_line_data(telegram):
         param.G_BREAKER_STATE,
     ]
 
-    return _get_line_data(telegram, 'gas_meter', tags, fields)
+    return _get_line_data(telegram, 'Gas\ meter', tags, fields)
 
 def write(telegram):
     global last_telegram
