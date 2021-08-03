@@ -9,8 +9,6 @@ This project uses an ESP32 with micropython firmware.
 
 Use a tool like [EsPy](https://github.com/jungervin/EsPy/tree/master/EsPy/Release) or [Thonny IDE](https://thonny.org/) to copy the python files onto the ESP32.  
 
-> WebREPL will be actived and can be accessed via [https://micropython.org/webrepl](https://micropython.org/webrepl) or via EsPy.
-
 # Hardware
 
  - ESP32 (optional: with charger circuit like *Wemos d32 pro*)
@@ -26,6 +24,24 @@ Connect GND (Pin 6) to ground on ESP32
 > Optional:  
 > Connect 5V (Pin 1) to 5V on ESP32 to charge the battery  
 > The smart meter's 5V supply isn't powerfull enough to power a ESP32 without battery
+
+# Remote access
+
+WebREPL will be actived but needs to be [setup on the device](https://docs.micropython.org/en/latest/esp8266/tutorial/repl.html#webrepl-a-prompt-over-wifi).  
+After setup, it can be accessed via [https://micropython.org/webrepl](https://micropython.org/webrepl) or via EsPy.
+
+Sample output:
+
+```log
+Welcome to MicroPython!                                                                                                                               
+Password:                                                                                                                                             
+WebREPL connected                                                                                                                                     
+>>> Metrics written                                                                                                                                   
+Metrics written                                                                                                                                       
+Metrics written                                                                                                                                       
+Metrics written                                                                                                                                       
+Metrics written                                                                                                                                       
+```
 
 # Resources
 
