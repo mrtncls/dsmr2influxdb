@@ -1,3 +1,4 @@
+import time
 import socket
 import dsmr_parameter_names as param
 
@@ -68,6 +69,7 @@ def _write_influxdb(line_data):
             if tcp_socket:
                 tcp_socket.close()
                 tcp_socket = None
+                time.sleep(2)
             if retries_left < 0:
                 raise e
 
