@@ -2,6 +2,7 @@ import time
 from dsmr_reader import read as read_dsmr
 from wifi import connect as connect_wifi
 from influxdb import write as write_to_influx
+from machine import WDT
 
 def start_webrepl():
     # run 'import webrepl_setup' from repl and setup a password
@@ -10,12 +11,14 @@ def start_webrepl():
 
 def main():
 
+    watchdog = WDT(timeout=60000)
+
     try:
         connect_wifi()
         start_webrepl()
     except Exception as e:
         print('Resetting... Connect error: {}'.format(e))
-        machine.reset()
+        machine.reset()    
 
     while True:
         
@@ -24,6 +27,8 @@ def main():
         except Exception as e:
             print('Resetting... Connect error: {}'.format(e))
             machine.reset()
+
+        watchdog.feed()
 
         telegram = None
         try:
